@@ -1,11 +1,13 @@
 from django.shortcuts import render
-from django.contrib.auth import authenticate, login
+from django.contrib.auth import authenticate, login, logout
 from django.http import HttpResponse
 from rango.models import Category, Page
 from rango.forms import CategoryForm
 from django.shortcuts import redirect
 from django.urls import reverse
 from rango.forms import PageForm, UserForm, UserProfileForm
+from django.contrib.auth.decorators import login_required
+
 
 
 def index(request):
@@ -31,6 +33,7 @@ def index(request):
     return render(request, 'rango/index.html', context=context_dict)
     
 
+
 def about(request):
     # context_dict = {'boldmessage': 'This tutorial has been put together by Josh'}
     # prints out whether the method is a GET or a POST
@@ -39,6 +42,7 @@ def about(request):
     print(request.user)
     return render(request, 'rango/about.html', {} ) # context=context_dict
     
+
 
 def show_category(request, category_name_slug):
     # Create a context dictionary which we can pass
@@ -70,6 +74,8 @@ def show_category(request, category_name_slug):
     # Go render the response and return it to the client.
     return render(request, 'rango/category.html', context=context_dict)
     
+    
+@login_required    
 def add_category(request):
     form = CategoryForm()
     
@@ -97,6 +103,7 @@ def add_category(request):
     return render(request, 'rango/add_category.html', {'form': form})
 
 
+@login_required
 def add_page(request, category_name_slug):
     try:
         category = Category.objects.get(slug=category_name_slug)
@@ -123,6 +130,7 @@ def add_page(request, category_name_slug):
             
     context_dict = {'form' : form, 'category' : category}
     return render(request, 'rango/add_page.html', context=context_dict)
+
 
 
 def register(request):
@@ -189,9 +197,7 @@ def register(request):
                              'profile_form' : profile_form, 
                              'registered': registered})     
                              
-                             
-                             
-                             
+                                                        
                              
                              
 def user_login(request):
@@ -238,8 +244,18 @@ def user_login(request):
         
         
         
+@login_required
+def restricted(request):
+    return render(request, 'rango/restricted.html' )     
         
         
         
-        
+# Use the login_required() decorator to ensure only those logged in can
+# access the view.
+@login_required
+def user_logout(request):
+    # Since we know the user is logged in, we can now just log them out.
+    logout(request)
+    # Take the user back to the homepage.
+    return redirect(reverse('rango:index'))        
                                  
