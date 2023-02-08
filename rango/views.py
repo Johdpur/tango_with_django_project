@@ -30,9 +30,7 @@ def index(request):
     # Initialise cookie
     # request.session.set_test_cookie()
     
-    # Call the helper function to handle the cookies
     visitor_cookie_handler(request)
-    context_dict['visits'] = request.session['visits']
     
     response = render(request, 'rango/index.html', context=context_dict)
     return response
@@ -50,8 +48,14 @@ def about(request):
     # if request.session.test_cookie_worked():
       #  print("TEST COOKIE WORKED!")
       #  request.session.delete_test_cookie()
+
+    context_dict = {}    
     
-    return render(request, 'rango/about.html', {} ) # context=context_dict
+    # Call the helper function to handle the cookies
+    visitor_cookie_handler(request)
+    context_dict['visits'] = request.session['visits']
+    
+    return render(request, 'rango/about.html', context=context_dict) # context=context_dict
     
 
 
